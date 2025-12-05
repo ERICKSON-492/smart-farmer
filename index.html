@@ -464,6 +464,26 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Voice Assistant Styles */
+        #voiceAssistant {
+            transition: all 0.3s ease;
+        }
+
+        #voiceAssistant:not(.hidden) {
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .main-content {
@@ -539,6 +559,10 @@
                 </a>
             </div>
             <div class="user-info">
+                <!-- AI Voice Assistant Button -->
+                <button class="btn btn-primary" onclick="toggleVoiceAssistant()" style="margin-right: 10px;">
+                    <i class="fas fa-microphone"></i> Voice Assistant
+                </button>
                 <div class="user-avatar" id="userAvatar">F</div>
                 <button class="btn btn-outline" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -685,6 +709,56 @@
                             <div class="stat-value" id="cropCount">3</div>
                             <div class="stat-label">Crops</div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Expert Contacts Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-phone-alt"></i> Expert Contacts
+                    </h3>
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                        <strong style="color: var(--dark-green); font-size: 0.9rem;">KALRO Helpline</strong>
+                        <div style="color: var(--text-dark); font-size: 0.9rem; margin-top: 5px;">
+                            <i class="fas fa-phone"></i> 0111 011 000
+                        </div>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                        <strong style="color: var(--water-blue); font-size: 0.9rem;">Agriculture Extension</strong>
+                        <div style="color: var(--text-dark); font-size: 0.9rem; margin-top: 5px;">
+                            <i class="fas fa-phone"></i> 020 271 8870
+                        </div>
+                    </div>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 10px;">
+                        <strong style="color: #e65100; font-size: 0.9rem;">Emergency Crop Care</strong>
+                        <div style="color: var(--text-dark); font-size: 0.9rem; margin-top: 5px;">
+                            <i class="fas fa-phone"></i> 0722 123 456
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organizations Section -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-landmark"></i> Organizations
+                    </h3>
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                        <strong style="color: var(--dark-green);">KALRO</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 5px;">
+                            Kenya Agricultural & Livestock Research Organization
+                        </p>
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 10px; padding: 8px; font-size: 0.9rem;" onclick="showKALROInfo()">
+                            <i class="fas fa-info-circle"></i> More Info
+                        </button>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: 10px;">
+                        <strong style="color: var(--dark-green);">MOALF</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 5px;">
+                            Ministry of Agriculture, Livestock & Fisheries
+                        </p>
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 10px; padding: 8px; font-size: 0.9rem;" onclick="showMOALFInfo()">
+                            <i class="fas fa-external-link-alt"></i> Visit Website
+                        </button>
                     </div>
                 </div>
 
@@ -1103,6 +1177,53 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- AI Voice Assistant UI -->
+    <div id="voiceAssistant" class="hidden" style="position: fixed; bottom: 20px; right: 20px; width: 350px; background: white; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 10000; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.2rem;">
+                    <i class="fas fa-robot"></i> Farm Assistant
+                </h3>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem; opacity: 0.9;">Ask me anything about farming</p>
+            </div>
+            <button onclick="toggleVoiceAssistant()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div style="padding: 20px; max-height: 300px; overflow-y: auto;" id="voiceChat">
+            <div style="background: var(--bg-light); padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; max-width: 80%;">
+                <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px;">Farm Assistant</div>
+                Hello! I'm your farming assistant. How can I help you today?
+            </div>
+        </div>
+        
+        <div style="padding: 20px; border-top: 1px solid #eee; display: flex; gap: 10px;">
+            <input type="text" id="voiceInput" placeholder="Type your question..." style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-family: inherit;">
+            <button onclick="sendVoiceQuery()" class="btn btn-primary" style="padding: 12px 20px;">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+            <button onclick="startVoiceRecognition()" class="btn btn-secondary" style="padding: 12px;">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+        
+        <div style="padding: 0 20px 20px 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button onclick="quickQuestion('weather advice')" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.8rem;">
+                Weather Advice
+            </button>
+            <button onclick="quickQuestion('disease help')" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.8rem;">
+                Disease Help
+            </button>
+            <button onclick="quickQuestion('market prices')" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.8rem;">
+                Market Prices
+            </button>
+            <button onclick="quickQuestion('soil tips')" class="btn btn-outline" style="padding: 8px 12px; font-size: 0.8rem;">
+                Soil Tips
+            </button>
         </div>
     </div>
 
@@ -1818,6 +1939,184 @@
             }
         }
 
+        // Voice Assistant Functions
+        function toggleVoiceAssistant() {
+            const assistant = document.getElementById('voiceAssistant');
+            assistant.classList.toggle('hidden');
+        }
+
+        function sendVoiceQuery() {
+            const input = document.getElementById('voiceInput');
+            const query = input.value.trim();
+            
+            if (query) {
+                addUserMessage(query);
+                processVoiceQuery(query);
+                input.value = '';
+            }
+        }
+
+        function startVoiceRecognition() {
+            showNotification('Voice recognition starting...', 'info');
+            
+            // Check if browser supports speech recognition
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showNotification('Speech recognition not supported in this browser', 'error');
+                return;
+            }
+            
+            // In a real implementation, this would use the Web Speech API
+            showNotification('Voice recognition simulated. Type your question instead.', 'info');
+            
+            // For demo purposes, we'll simulate voice recognition
+            setTimeout(() => {
+                const sampleQuestions = [
+                    "What's the weather forecast?",
+                    "How to treat maize diseases?",
+                    "Current market prices for coffee",
+                    "Best fertilizer for my soil"
+                ];
+                const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+                document.getElementById('voiceInput').value = randomQuestion;
+                showNotification(`Try asking: "${randomQuestion}"`, 'info');
+            }, 1000);
+        }
+
+        function addUserMessage(message) {
+            const chat = document.getElementById('voiceChat');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                background: var(--primary-green);
+                color: white;
+                padding: 10px 15px;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                margin-left: 20%;
+                max-width: 80%;
+                text-align: right;
+            `;
+            messageDiv.innerHTML = message;
+            chat.appendChild(messageDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addAssistantMessage(message) {
+            const chat = document.getElementById('voiceChat');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                background: var(--bg-light);
+                padding: 10px 15px;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                max-width: 80%;
+            `;
+            messageDiv.innerHTML = `
+                <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px;">Farm Assistant</div>
+                ${message}
+            `;
+            chat.appendChild(messageDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function processVoiceQuery(query) {
+            const lowerQuery = query.toLowerCase();
+            let response = "I'm not sure about that. Can you try asking in a different way?";
+            
+            // Predefined responses based on query keywords
+            if (lowerQuery.includes('weather') || lowerQuery.includes('rain')) {
+                const county = document.getElementById('currentCounty').value;
+                response = `Based on ${county} County forecast, today's weather is favorable for farming. No heavy rains expected in the next 24 hours.`;
+            } else if (lowerQuery.includes('disease') || lowerQuery.includes('sick')) {
+                const crop = document.getElementById('primaryCrop').value;
+                response = `For ${crop} diseases, I recommend checking the disease detection section. Common issues include fungal infections during rainy seasons.`;
+            } else if (lowerQuery.includes('price') || lowerQuery.includes('market')) {
+                response = "Current market prices are stable. Maize is at KSh 3,500 per 90kg bag. Check the market section for detailed prices.";
+            } else if (lowerQuery.includes('soil') || lowerQuery.includes('fertilizer')) {
+                response = "Your soil analysis shows good pH levels. Recommended fertilizer: NPK 17:17:17 at 50kg per acre.";
+            } else if (lowerQuery.includes('plant') || lowerQuery.includes('season')) {
+                response = "Current season: Long Rains (March-May). Good time for planting maize, beans, and potatoes.";
+            } else if (lowerQuery.includes('help') || lowerQuery.includes('support')) {
+                response = "For expert help, contact KALRO at 0111 011 000 or Agriculture Extension at 020 271 8870.";
+            } else if (lowerQuery.includes('hi') || lowerQuery.includes('hello')) {
+                response = "Hello! I'm your farming assistant. Ask me about weather, crops, diseases, or market prices.";
+            } else if (lowerQuery.includes('kalro')) {
+                response = "KALRO is Kenya Agricultural & Livestock Research Organization. They provide research and extension services. Contact them at 0111 011 000.";
+            } else if (lowerQuery.includes('contact') || lowerQuery.includes('number')) {
+                response = "Expert contacts: KALRO Helpline: 0111 011 000, Agriculture Extension: 020 271 8870, Emergency: 0722 123 456.";
+            }
+            
+            // Simulate typing delay
+            setTimeout(() => {
+                addAssistantMessage(response);
+                // Speak the response
+                speakText(response);
+            }, 1000);
+        }
+
+        function quickQuestion(type) {
+            let query = '';
+            switch(type) {
+                case 'weather advice':
+                    query = "What's the weather advice for today?";
+                    break;
+                case 'disease help':
+                    query = "Help with crop diseases";
+                    break;
+                case 'market prices':
+                    query = "Current market prices";
+                    break;
+                case 'soil tips':
+                    query = "Soil improvement tips";
+                    break;
+            }
+            
+            document.getElementById('voiceInput').value = query;
+            sendVoiceQuery();
+        }
+
+        function speakText(text) {
+            // In a real implementation, this would use the Web Speech API
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Organization Info Functions
+        function showKALROInfo() {
+            const message = `
+                <strong>KALRO - Kenya Agricultural & Livestock Research Organization</strong><br><br>
+                <strong>Services:</strong><br>
+                • Crop research & development<br>
+                • Livestock improvement<br>
+                • Soil testing services<br>
+                • Farmer training programs<br><br>
+                <strong>Contact:</strong> 0111 011 000<br>
+                <strong>Email:</strong> info@kalro.org<br>
+                <strong>Website:</strong> www.kalro.org
+            `;
+            showNotification(message, 'info');
+            addAssistantMessage("KALRO is Kenya's premier agricultural research organization. They provide research, extension services, and farmer support across all counties.");
+        }
+
+        function showMOALFInfo() {
+            const message = `
+                <strong>MOALF - Ministry of Agriculture, Livestock & Fisheries</strong><br><br>
+                <strong>Services:</strong><br>
+                • Agricultural policy<br>
+                • Extension services<br>
+                • Subsidy programs<br>
+                • Market access support<br><br>
+                <strong>Contact:</strong> 020 271 8870<br>
+                <strong>Email:</strong> ps@agriculture.go.ke
+            `;
+            showNotification(message, 'info');
+            addAssistantMessage("MOALF oversees agricultural development in Kenya. They implement government programs like fertilizer subsidies and crop insurance.");
+        }
+
         // Utility Functions
         function showNotification(message, type = 'info') {
             // Create notification element
@@ -1832,6 +2131,8 @@
                 font-weight: 500;
                 z-index: 10000;
                 animation: slideIn 0.3s ease;
+                max-width: 400px;
+                word-wrap: break-word;
             `;
             
             // Set color based on type
@@ -1854,13 +2155,15 @@
             
             document.body.appendChild(notification);
             
-            // Remove notification after 3 seconds
+            // Remove notification after 5 seconds
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
                 }, 300);
-            }, 3000);
+            }, 5000);
         }
 
         function updateDashboard() {
@@ -1911,6 +2214,17 @@
                 to {
                     transform: translateX(100%);
                     opacity: 0;
+                }
+            }
+            
+            @keyframes slideUp {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
                 }
             }
         `;
