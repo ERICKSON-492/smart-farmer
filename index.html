@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Smart Farmer Kenya - AI-Powered Agriculture Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #2e7d32;
+            --light-green: #4caf50;
+            --dark-green: #1b5e20;
+            --soil-brown: #8d6e63;
+            --water-blue: #2196f3;
+            --sun-yellow: #ff9800;
+            --danger-red: #f44336;
+            --warning-orange: #ff9800;
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            border-bottom: 5px solid var(--sun-yellow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--sun-yellow);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--sun-yellow);
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .nav-link.active {
+            background-color: var(--sun-yellow);
+            color: var(--dark-green);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-green);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .county-select, .crop-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .county-select:focus, .crop-select:focus {
+            outline: none;
+            border-color: var(--light-green);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            background: var(--bg-white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            color: var(--primary-green);
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .weather-day {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 10px;
+        }
+
+        .weather-temp {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+
+        .disease-result {
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8f5e9 100%);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .disease-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-bottom: 10px;
+        }
+
+        .disease-status.healthy {
+            color: var(--light-green);
+            font-weight: 600;
+        }
+
+        .disease-status.infected {
+            color: var(--danger-red);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--water-blue);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-green);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Forms */
+        .login-container, .register-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--light-green);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: var(--dark-green);
+            border-left: 5px solid var(--light-green);
+        }
+
+        .alert-warning {
+            background-color: #fff3e0;
+            color: #e65100;
+            border-left: 5px solid var(--warning-orange);
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            color: var(--danger-red);
+            border-left: 5px solid var(--danger-red);
+        }
+
+        /* Tables */
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .price-table th, .price-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-table th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .price-trend.up {
+            color: var(--light-green);
+        }
+
+        .price-trend.down {
+            color: var(--danger-red);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .weather-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .p-20 {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <h1>Smart Farmer <span>Kenya</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="#" class="nav-link" onclick="showSection('disease')">
+                    <i class="fas fa-bug"></i> Disease Detection
+                </a>
+                <a href="#" class="nav-link" onclick="showSection('weather')">
+                    <i class="fas fa-cloud-sun"></i> Weather
+                </a>
+                <a href="#" class="nav-link" onclick="showSection('market')">
+                    <i class="fas fa-chart-line"></i> Market Prices
+                </a>
+                <a href="#" class="nav-link" onclick="showSection('soil')">
+                    <i class="fas fa-seedling"></i> Soil Analysis
+                </a>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">F</div>
+                <button class="btn btn-outline" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="container login-container">
+        <div class="logo text-center mb-20">
+            <i class="fas fa-leaf" style="font-size: 4rem; color: var(--primary-green);"></i>
+            <h1 style="font-size: 2.5rem;">Smart Farmer Kenya</h1>
+            <p style="color: var(--text-light); margin-top: 10px;">AI-Powered Agriculture Assistant</p>
+        </div>
+
+        <div class="alert alert-success">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>Demo Account:</strong> farmer / password123
+            </div>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="loginUsername" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+
+        <div class="text-center mt-20">
+            <p style="color: var(--text-light);">Don't have an account? 
+                <a href="#" onclick="showRegister()" style="color: var(--primary-green); text-decoration: none; font-weight: 500;">
+                    Register here
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Section -->
+    <div id="registerSection" class="container register-container hidden">
+        <div class="logo text-center mb-20">
+            <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--primary-green);"></i>
+            <h1 style="font-size: 2rem;">Create Account</h1>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="registerUsername" placeholder="Choose a username" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="registerPassword" placeholder="Choose a password" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email (Optional)</label>
+                <input type="email" class="form-input" id="registerEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">County</label>
+                <select class="form-input" id="registerCounty" required>
+                    <option value="">Select your county</option>
+                    <option value="Nairobi">Nairobi</option>
+                    <option value="Kiambu">Kiambu</option>
+                    <option value="Nakuru">Nakuru</option>
+                    <option value="Kisumu">Kisumu</option>
+                    <option value="Mombasa">Mombasa</option>
+                    <option value="Meru">Meru</option>
+                    <option value="Kakamega">Kakamega</option>
+                    <option value="Uasin Gishu">Uasin Gishu</option>
+                    <option value="Kericho">Kericho</option>
+                    <option value="Machakos">Machakos</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Farm Type</label>
+                <select class="form-input" id="registerFarmType" required>
+                    <option value="mixed">Mixed Farming</option>
+                    <option value="crops">Crops Only</option>
+                    <option value="livestock">Livestock Only</option>
+                    <option value="horticulture">Horticulture</option>
+                </select>
+            </div>
+            <div class="btn-group" style="width: 100%;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+                <button type="button" class="btn btn-outline" style="flex: 1;" onclick="showLogin()">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainContent" class="container hidden">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-map-marker-alt"></i> Farm Location
+                    </h3>
+                    <select class="county-select" id="currentCounty" onchange="updateDashboard()">
+                        <option value="Nairobi">Nairobi</option>
+                        <option value="Kiambu">Kiambu</option>
+                        <option value="Nakuru">Nakuru</option>
+                        <option value="Kisumu">Kisumu</option>
+                        <option value="Mombasa">Mombasa</option>
+                    </select>
+                    <p style="color: var(--text-light); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Changing county updates all data
+                    </p>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-seedling"></i> My Crops
+                    </h3>
+                    <select class="crop-select" id="primaryCrop" onchange="updateCropData()">
+                        <option value="Maize">Maize</option>
+                        <option value="Beans">Beans</option>
+                        <option value="Coffee">Coffee</option>
+                        <option value="Tea">Tea</option>
+                        <option value="Tomatoes">Tomatoes</option>
+                        <option value="Potatoes">Potatoes</option>
+                        <option value="Avocado">Avocado</option>
+                        <option value="Mango">Mango</option>
+                    </select>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="farmSize">2.5</div>
+                            <div class="stat-label">Acres</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="cropCount">3</div>
+                            <div class="stat-label">Crops</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-calendar-alt"></i> Season
+                    </h3>
+                    <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--dark-green);" id="currentSeason">
+                            Long Rains
+                        </div>
+                        <div style="color: var(--text-light); font-size: 0.9rem; margin-top: 5px;" id="seasonPeriod">
+                            March - May
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span style="background: var(--light-green); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.8rem;">
+                                Planting Season
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-bullhorn"></i> Quick Actions
+                    </h3>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="showSection('disease')">
+                        <i class="fas fa-camera"></i> Scan Crop
+                    </button>
+                    <button class="btn btn-outline" style="width: 100%; margin-bottom: 10px;" onclick="checkWeather()">
+                        <i class="fas fa-cloud-sun-rain"></i> Check Weather
+                    </button>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="showSection('market')">
+                        <i class="fas fa-search-dollar"></i> Market Prices
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard">
+                <div id="dashboardSection">
+                    <div class="dashboard-header">
+                        <div>
+                            <h1 class="dashboard-title">Welcome, <span id="userName">Farmer</span>!</h1>
+                            <p class="dashboard-subtitle" id="farmLocation">
+                                <i class="fas fa-map-marker-alt"></i> Kiambu County, Kenya
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.5rem; color: var(--primary-green);" id="currentTemp">
+                                24°C
+                            </div>
+                            <div style="color: var(--text-light);" id="weatherCondition">
+                                Partly Cloudy
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <!-- Weather Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">7-Day Forecast</h3>
+                                <i class="fas fa-cloud-sun card-icon"></i>
+                            </div>
+                            <div class="weather-grid" id="weatherForecast">
+                                <!-- Weather days will be populated here -->
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-outline" onclick="showSection('weather')">
+                                    <i class="fas fa-chart-line"></i> Detailed Forecast
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Disease Detection Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Crop Health</h3>
+                                <i class="fas fa-heartbeat card-icon"></i>
+                            </div>
+                            <div id="diseaseStatus">
+                                <div class="disease-result">
+                                    <div class="disease-name">Maize Lethal Necrosis</div>
+                                    <div class="disease-status infected">Infected - High Severity</div>
+                                    <div style="margin-top: 15px; color: var(--text-light);">
+                                        <i class="fas fa-exclamation-triangle" style="color: var(--warning-orange);"></i>
+                                        Immediate action required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="showSection('disease')">
+                                    <i class="fas fa-camera"></i> Scan Another Crop
+                                </button>
+                                <button class="btn btn-outline" onclick="showTreatment()">
+                                    <i class="fas fa-prescription-bottle-alt"></i> View Treatment
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Market Prices Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Market Prices</h3>
+                                <i class="fas fa-chart-line card-icon"></i>
+                            </div>
+                            <table class="price-table">
+                                <thead>
+                                    <tr>
+                                        <th>Crop</th>
+                                        <th>Price (KSh)</th>
+                                        <th>Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marketPricesTable">
+                                    <!-- Market prices will be populated here -->
+                                </tbody>
+                            </table>
+                            <div class="btn-group">
+                                <button class="btn btn-outline" onclick="showSection('market')">
+                                    <i class="fas fa-search-dollar"></i> View All Prices
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Soil Health Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Soil Health</h3>
+                                <i class="fas fa-seedling card-icon"></i>
+                            </div>
+                            <div style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>pH Level:</span>
+                                    <strong style="color: var(--primary-green);" id="soilPH">6.5</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>Fertility:</span>
+                                    <strong style="color: var(--primary-green);" id="soilFertility">Medium</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>Moisture:</span>
+                                    <strong style="color: var(--water-blue);" id="soilMoisture">Optimal</strong>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-outline" onclick="showSection('soil')">
+                                    <i class="fas fa-flask"></i> Detailed Analysis
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-water"></i> Irrigation Plan
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Government Programs Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Government Programs</h3>
+                                <i class="fas fa-landmark card-icon"></i>
+                            </div>
+                            <div style="padding: 10px;">
+                                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                                    <strong style="color: var(--dark-green);">Fertilizer Subsidy</strong>
+                                    <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 5px;">
+                                        50% subsidy on fertilizers for registered farmers
+                                    </p>
+                                </div>
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px;">
+                                    <strong style="color: var(--water-blue);">Agricultural Insurance</strong>
+                                    <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 5px;">
+                                        Weather-indexed insurance available
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-file-alt"></i> Apply Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disease Detection Section -->
+                <div id="diseaseSection" class="hidden">
+                    <div class="dashboard-header">
+                        <div>
+                            <h1 class="dashboard-title">Crop Disease Detection</h1>
+                            <p class="dashboard-subtitle">
+                                Upload a photo of your crop for AI-powered disease diagnosis
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Scan Your Crop</h3>
+                            <i class="fas fa-bug card-icon"></i>
+                        </div>
+
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <div style="width: 200px; height: 200px; border: 3px dashed #ddd; border-radius: 15px; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;" 
+                                 onclick="document.getElementById('imageUpload').click()"
+                                 id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #ddd;"></i>
+                            </div>
+                            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                            
+                            <div style="margin: 20px 0;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: 500;">Select Crop Type</label>
+                                <select class="crop-select" id="detectionCropType">
+                                    <option value="Maize">Maize</option>
+                                    <option value="Coffee">Coffee</option>
+                                    <option value="Tea">Tea</option>
+                                    <option value="Tomatoes">Tomatoes</option>
+                                    <option value="Potatoes">Potatoes</option>
+                                    <option value="Beans">Beans</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="detectDisease()" id="detectBtn">
+                                <i class="fas fa-search"></i> Detect Disease
+                            </button>
+                            <button class="btn btn-outline" onclick="useSampleImage()" style="margin-left: 10px;">
+                                <i class="fas fa-vial"></i> Use Sample
+                            </button>
+                        </div>
+
+                        <div id="detectionResult" class="hidden">
+                            <!-- Results will be shown here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Section -->
+                <div id="weatherSection" class="hidden">
+                    <div class="dashboard-header">
+                        <div>
+                            <h1 class="dashboard-title">Weather Forecast</h1>
+                            <p class="dashboard-subtitle" id="weatherLocation">
+                                Kiambu County, Central Highlands Region
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Current Conditions</h3>
+                            <div style="text-align: right;">
+                                <div style="font-size: 2rem; color: var(--primary-green);" id="detailedTemp">
+                                    24°C
+                                </div>
+                                <div style="color: var(--text-light);" id="detailedCondition">
+                                    Feels like 26°C
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="padding: 20px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                                <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                                    <div style="color: var(--text-light);">Humidity</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--water-blue);" id="weatherHumidity">
+                                        65%
+                                    </div>
+                                </div>
+                                <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                                    <div style="color: var(--text-light);">Rainfall</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--water-blue);" id="weatherRainfall">
+                                        0 mm
+                                    </div>
+                                </div>
+                                <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                                    <div style="color: var(--text-light);">Wind Speed</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--water-blue);" id="weatherWind">
+                                        12 km/h
+                                    </div>
+                                </div>
+                                <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                                    <div style="color: var(--text-light);">UV Index</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--sun-yellow);" id="weatherUV">
+                                        8
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 style="margin-bottom: 20px; color: var(--dark-green);">7-Day Forecast</h3>
+                            <div id="detailedForecast">
+                                <!-- Detailed forecast will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <h3 class="card-title">Farming Advisory</h3>
+                            <i class="fas fa-tractor card-icon"></i>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div id="farmingAdvisory">
+                                <!-- Advisory will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Prices Section -->
+                <div id="marketSection" class="hidden">
+                    <div class="dashboard-header">
+                        <div>
+                            <h1 class="dashboard-title">Market Prices</h1>
+                            <p class="dashboard-subtitle">
+                                Real-time market prices across Kenyan counties
+                            </p>
+                        </div>
+                        <div>
+                            <select class="county-select" id="marketCounty" onchange="updateMarketPrices()">
+                                <option value="Nairobi">Nairobi Market</option>
+                                <option value="Mombasa">Mombasa Market</option>
+                                <option value="Kisumu">Kisumu Market</option>
+                                <option value="Nakuru">Nakuru Market</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Current Prices (KSh)</h3>
+                            <i class="fas fa-coins card-icon"></i>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div id="marketPricesDetailed">
+                                <!-- Detailed market prices will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <h3 class="card-title">Trading Advice</h3>
+                            <i class="fas fa-lightbulb card-icon"></i>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div id="tradingAdvice">
+                                <!-- Trading advice will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soil Analysis Section -->
+                <div id="soilSection" class="hidden">
+                    <div class="dashboard-header">
+                        <div>
+                            <h1 class="dashboard-title">Soil Analysis</h1>
+                            <p class="dashboard-subtitle">
+                                Comprehensive soil health assessment and recommendations
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Soil Properties</h3>
+                            <i class="fas fa-flask card-icon"></i>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                                <div style="background: linear-gradient(135deg, #8d6e63 0%, #6d4c41 100%); color: white; padding: 20px; border-radius: 10px;">
+                                    <div>Soil Texture</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600;" id="soilTexture">Volcanic Loam</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; padding: 20px; border-radius: 10px;">
+                                    <div>pH Level</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600;" id="soilDetailedPH">6.5</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%); color: white; padding: 20px; border-radius: 10px;">
+                                    <div>Organic Matter</div>
+                                    <div style="font-size: 1.5rem; font-weight: 600;" id="soilOrganic">2.8%</div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 30px;">
+                                <h3 style="margin-bottom: 15px; color: var(--dark-green);">Nutrient Levels</h3>
+                                <div id="nutrientLevels">
+                                    <!-- Nutrient levels will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <h3 class="card-title">Fertilizer Recommendations</h3>
+                            <i class="fas fa-prescription-bottle card-icon"></i>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div id="fertilizerRecommendations">
+                                <!-- Recommendations will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <h3 class="card-title">Suitable Crops</h3>
+                            <i class="fas fa-seedling card-icon"></i>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div id="suitableCrops">
+                                <!-- Suitable crops will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8000';
+        let currentUser = null;
+        let currentToken = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in (from localStorage)
+            const savedUser = localStorage.getItem('smartFarmerUser');
+            const savedToken = localStorage.getItem('smartFarmerToken');
+            
+            if (savedUser && savedToken) {
+                currentUser = JSON.parse(savedUser);
+                currentToken = savedToken;
+                showMainContent();
+                loadDashboardData();
+            }
+            
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                login();
+            });
+
+            // Register form
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                register();
+            });
+        }
+
+        // Authentication Functions
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await axios.post(`${API_BASE_URL}/login`, {
+                    username: username,
+                    password: password
+                });
+
+                if (response.data.success) {
+                    currentUser = response.data.user;
+                    currentToken = response.data.token;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('smartFarmerUser', JSON.stringify(currentUser));
+                    localStorage.setItem('smartFarmerToken', currentToken);
+                    
+                    showMainContent();
+                    loadDashboardData();
+                    showNotification('Login successful! Karibu!', 'success');
+                }
+            } catch (error) {
+                showNotification('Login failed. Please check your credentials.', 'error');
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const email = document.getElementById('registerEmail').value;
+            const county = document.getElementById('registerCounty').value;
+            const farmType = document.getElementById('registerFarmType').value;
+
+            try {
+                const response = await axios.post(`${API_BASE_URL}/register`, {
+                    username: username,
+                    password: password,
+                    email: email,
+                    county: county,
+                    farm_type: farmType,
+                    crops: ["Maize", "Beans"],
+                    livestock: ["Chicken"],
+                    farm_size: 2.5,
+                    soil_type: "Volcanic"
+                });
+
+                if (response.data.success) {
+                    currentUser = response.data.user;
+                    currentToken = response.data.token;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('smartFarmerUser', JSON.stringify(currentUser));
+                    localStorage.setItem('smartFarmerToken', currentToken);
+                    
+                    showMainContent();
+                    loadDashboardData();
+                    showNotification('Registration successful! Karibu!', 'success');
+                }
+            } catch (error) {
+                showNotification('Registration failed. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentToken = null;
+            localStorage.removeItem('smartFarmerUser');
+            localStorage.removeItem('smartFarmerToken');
+            showLogin();
+            showNotification('Logged out successfully', 'info');
+        }
+
+        // Navigation Functions
+        function showLogin() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('registerSection').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+        }
+
+        function showMainContent() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            
+            // Update user info
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.username;
+                document.getElementById('userAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+                document.getElementById('farmLocation').innerHTML = 
+                    `<i class="fas fa-map-marker-alt"></i> ${currentUser.county} County, Kenya`;
+                
+                // Set county select to user's county
+                document.getElementById('currentCounty').value = currentUser.county;
+            }
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('diseaseSection').classList.add('hidden');
+            document.getElementById('weatherSection').classList.add('hidden');
+            document.getElementById('marketSection').classList.add('hidden');
+            document.getElementById('soilSection').classList.add('hidden');
+            
+            // Show selected section
+            document.getElementById(`${sectionName}Section`).classList.remove('hidden');
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Load section data if needed
+            switch(sectionName) {
+                case 'weather':
+                    loadWeatherData();
+                    break;
+                case 'market':
+                    loadMarketPrices();
+                    break;
+                case 'soil':
+                    loadSoilAnalysis();
+                    break;
+            }
+        }
+
+        // Data Loading Functions
+        async function loadDashboardData() {
+            if (!currentToken) return;
+            
+            try {
+                const response = await axios.get(`${API_BASE_URL}/dashboard`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+                
+                if (response.data.success) {
+                    updateDashboardUI(response.data);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateDashboardUI(data) {
+            // Update weather
+            const weather = data.kenya_data.weather;
+            if (weather) {
+                document.getElementById('currentTemp').textContent = 
+                    `${Math.round(weather.current.temperature)}°C`;
+                document.getElementById('weatherCondition').textContent = 
+                    weather.current.condition;
+                
+                // Update 7-day forecast
+                updateWeatherForecast(weather.forecast);
+            }
+            
+            // Update soil data
+            const soil = data.kenya_data.soil;
+            if (soil) {
+                document.getElementById('soilPH').textContent = soil.ph;
+                document.getElementById('soilFertility').textContent = soil.fertility;
+            }
+            
+            // Update market prices
+            const market = data.kenya_data.market;
+            if (market) {
+                updateMarketPricesTable(market);
+            }
+            
+            // Update farm stats
+            document.getElementById('farmSize').textContent = 
+                data.user.farm_size || '2.5';
+            document.getElementById('cropCount').textContent = 
+                data.user.crops ? data.user.crops.length : '3';
+        }
+
+        function updateWeatherForecast(forecast) {
+            const container = document.getElementById('weatherForecast');
+            container.innerHTML = '';
+            
+            // Take first 4 days
+            forecast.slice(0, 4).forEach(day => {
+                const date = new Date(day.date);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                
+                const weatherDay = document.createElement('div');
+                weatherDay.className = 'weather-day';
+                weatherDay.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 5px;">${dayName}</div>
+                    <div class="weather-temp">${Math.round(day.temp_max)}°</div>
+                    <div style="font-size: 0.9rem; color: var(--text-light); margin-top: 5px;">
+                        ${Math.round(day.precipitation)}mm
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 5px;">
+                        ${day.condition}
+                    </div>
+                `;
+                container.appendChild(weatherDay);
+            });
+        }
+
+        function updateMarketPricesTable(marketData) {
+            const tableBody = document.getElementById('marketPricesTable');
+            tableBody.innerHTML = '';
+            
+            Object.keys(marketData).forEach(crop => {
+                const priceData = marketData[crop];
+                const trendClass = priceData.trend === 'up' ? 'up' : 
+                                  priceData.trend === 'down' ? 'down' : '';
+                const trendIcon = priceData.trend === 'up' ? '↑' : 
+                                 priceData.trend === 'down' ? '↓' : '→';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${crop}</td>
+                    <td>${priceData.price} KSh/${priceData.unit}</td>
+                    <td class="price-trend ${trendClass}">${trendIcon} ${priceData.trend}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Disease Detection Functions
+        async function detectDisease() {
+            const cropType = document.getElementById('detectionCropType').value;
+            const imageInput = document.getElementById('imageUpload');
+            
+            if (!imageInput.files.length && !currentUser.sampleImage) {
+                showNotification('Please upload an image first', 'warning');
+                return;
+            }
+            
+            // Show loading
+            const detectBtn = document.getElementById('detectBtn');
+            const originalText = detectBtn.innerHTML;
+            detectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+            detectBtn.disabled = true;
+            
+            try {
+                let imageBase64 = currentUser.sampleImage;
+                
+                if (imageInput.files.length) {
+                    imageBase64 = await convertImageToBase64(imageInput.files[0]);
+                }
+                
+                const response = await axios.post(`${API_BASE_URL}/crop/detect`, {
+                    crop_type: cropType,
+                    image: imageBase64
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+                
+                if (response.data.success) {
+                    showDiseaseResult(response.data.detection.result);
+                }
+            } catch (error) {
+                console.error('Error detecting disease:', error);
+                showNotification('Disease detection failed. Please try again.', 'error');
+            } finally {
+                detectBtn.innerHTML = originalText;
+                detectBtn.disabled = false;
+            }
+        }
+
+        function showDiseaseResult(result) {
+            const container = document.getElementById('detectionResult');
+            container.classList.remove('hidden');
+            
+            const statusClass = result.is_healthy ? 'healthy' : 'infected';
+            const statusText = result.is_healthy ? 'Healthy' : 'Infected';
+            const severityColor = result.severity === 'High' ? 'var(--danger-red)' : 
+                                result.severity === 'Medium' ? 'var(--warning-orange)' : 'var(--light-green)';
+            
+            container.innerHTML = `
+                <div style="background: ${result.is_healthy ? '#e8f5e9' : '#ffebee'}; 
+                           padding: 30px; border-radius: 10px; margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <div class="disease-name">${result.disease}</div>
+                            <div class="disease-status ${statusClass}">
+                                ${statusText} - ${result.severity} Severity
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 10px 20px; border-radius: 25px; font-weight: 600;">
+                            Confidence: ${(result.confidence * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: var(--dark-green); margin-bottom: 10px;">
+                            <i class="fas fa-info-circle"></i> Symptoms
+                        </h4>
+                        <p>${result.symptoms}</p>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: var(--dark-green); margin-bottom: 10px;">
+                            <i class="fas fa-prescription-bottle-alt"></i> Recommendations
+                        </h4>
+                        <ul style="padding-left: 20px;">
+                            ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: var(--dark-green); margin-bottom: 10px;">
+                            <i class="fas fa-shield-alt"></i> Prevention Tips
+                        </h4>
+                        <ul style="padding-left: 20px;">
+                            ${result.prevention.map(tip => `<li>${tip}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="showTreatment()">
+                            <i class="fas fa-clipboard-list"></i> View Detailed Treatment
+                        </button>
+                        <button class="btn btn-outline" onclick="saveDetection()">
+                            <i class="fas fa-save"></i> Save Report
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            const uploadArea = document.getElementById('uploadArea');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadArea.innerHTML = `
+                        <img src="${e.target.result}" style="max-width: 100%; max-height: 100%; border-radius: 10px;">
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function useSampleImage() {
+            // In a real app, this would use a pre-loaded sample image
+            showNotification('Using sample image for maize crop', 'info');
+            
+            // Simulate image upload
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--light-green);"></i>
+                    <div style="margin-top: 10px;">Sample Image Loaded</div>
+                    <div style="font-size: 0.9rem; color: var(--text-light);">Maize crop sample</div>
+                </div>
+            `;
+            
+            // Set current user sample image flag
+            currentUser.sampleImage = true;
+        }
+
+        function convertImageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Weather Functions
+        async function loadWeatherData() {
+            const county = document.getElementById('currentCounty').value;
+            
+            try {
+                const response = await axios.post(`${API_BASE_URL}/weather/forecast`, {
+                    county: county
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+                
+                if (response.data.success) {
+                    updateDetailedWeatherUI(response.data.forecast);
+                }
+            } catch (error) {
+                console.error('Error loading weather:', error);
+            }
+        }
+
+        function updateDetailedWeatherUI(weather) {
+            document.getElementById('weatherLocation').textContent = 
+                `${weather.county} County, ${weather.region} Region`;
+            document.getElementById('detailedTemp').textContent = 
+                `${Math.round(weather.current.temperature)}°C`;
+            document.getElementById('detailedCondition').textContent = 
+                `${weather.current.condition} | Feels like ${Math.round(weather.current.feels_like)}°C`;
+            
+            // Update current conditions
+            document.getElementById('weatherHumidity').textContent = 
+                `${weather.current.humidity}%`;
+            document.getElementById('weatherRainfall').textContent = 
+                `${weather.current.precipitation} mm`;
+            document.getElementById('weatherWind').textContent = 
+                `${weather.current.wind_speed} km/h`;
+            document.getElementById('weatherUV').textContent = 
+                weather.current.uv_index || 'N/A';
+            
+            // Update detailed forecast
+            updateDetailedForecast(weather.forecast);
+            
+            // Update farming advisory
+            updateFarmingAdvisory(weather);
+        }
+
+        function updateDetailedForecast(forecast) {
+            const container = document.getElementById('detailedForecast');
+            container.innerHTML = '';
+            
+            forecast.forEach(day => {
+                const date = new Date(day.date);
+                const dayName = date.toLocaleDateString('en-US', { 
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 15px;
+                    background: var(--bg-light);
+                    border-radius: 10px;
+                    margin-bottom: 10px;
+                `;
+                
+                dayDiv.innerHTML = `
+                    <div style="flex: 2;">
+                        <div style="font-weight: 600;">${dayName}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-light);">${day.condition}</div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--primary-green);">
+                            ${Math.round(day.temp_max)}°
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-light);">
+                            Low: ${Math.round(day.temp_min)}°
+                        </div>
+                    </div>
+                    <div style="flex: 1; text-align: right;">
+                        <div style="color: var(--water-blue);">
+                            <i class="fas fa-tint"></i> ${day.precipitation}mm
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-light);">
+                            Humidity: ${day.humidity || 60}%
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(dayDiv);
+            });
+        }
+
+        function updateFarmingAdvisory(weather) {
+            const container = document.getElementById('farmingAdvisory');
+            
+            let advisoryHTML = '';
+            
+            if (weather.farming_advice && weather.farming_advice.length > 0) {
+                advisoryHTML += '<h4 style="color: var(--dark-green); margin-bottom: 15px;">Recommendations:</h4>';
+                advisoryHTML += '<ul style="padding-left: 20px;">';
+                weather.farming_advice.forEach(advice => {
+                    advisoryHTML += `<li style="margin-bottom: 10px;">${advice}</li>`;
+                });
+                advisoryHTML += '</ul>';
+            }
+            
+            if (weather.alerts && weather.alerts.length > 0) {
+                advisoryHTML += '<div style="margin-top: 20px;">';
+                advisoryHTML += '<h4 style="color: var(--danger-red); margin-bottom: 15px;">Alerts:</h4>';
+                weather.alerts.forEach(alert => {
+                    advisoryHTML += `
+                        <div style="background: #ffebee; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                            <div style="font-weight: 600; color: var(--danger-red);">
+                                <i class="fas fa-exclamation-triangle"></i> ${alert.type}
+                            </div>
+                            <div style="margin-top: 5px;">${alert.message}</div>
+                        </div>
+                    `;
+                });
+                advisoryHTML += '</div>';
+            }
+            
+            container.innerHTML = advisoryHTML || '<p>No specific advisory for current conditions.</p>';
+        }
+
+        // Market Prices Functions
+        async function loadMarketPrices() {
+            const county = document.getElementById('marketCounty').value;
+            
+            try {
+                const response = await axios.post(`${API_BASE_URL}/market/prices`, {
+                    county: county
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+                
+                if (response.data.success) {
+                    updateDetailedMarketPrices(response.data.market_data);
+                }
+            } catch (error) {
+                console.error('Error loading market prices:', error);
+            }
+        }
+
+        function updateDetailedMarketPrices(marketData) {
+            const container = document.getElementById('marketPricesDetailed');
+            
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-green);">
+                            ${marketData.price} KSh
+                        </div>
+                        <div style="color: var(--text-light);">per ${marketData.unit}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--dark-green);">
+                            ${marketData.market}
+                        </div>
+                        <div style="color: var(--text-light);">${marketData.county} County</div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
+                    <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                        <div style="color: var(--text-light);">Trend</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; 
+                                    color: ${marketData.trend === 'up' ? 'var(--light-green)' : 
+                                           marketData.trend === 'down' ? 'var(--danger-red)' : 'var(--text-dark)'};">
+                            ${marketData.trend === 'up' ? '↗ Increasing' : 
+                              marketData.trend === 'down' ? '↘ Decreasing' : '→ Stable'}
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                        <div style="color: var(--text-light);">Seasonal Factor</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--primary-green);">
+                            ${marketData.seasonal_factor}x
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                        <div style="color: var(--text-light);">Regional Factor</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--primary-green);">
+                            ${marketData.regional_factor}x
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add trading advice
+            if (marketData.advice && marketData.advice.length > 0) {
+                html += '<div id="tradingAdviceContent">';
+                html += '<h4 style="color: var(--dark-green); margin-bottom: 15px;">Trading Advice:</h4>';
+                html += '<ul style="padding-left: 20px;">';
+                marketData.advice.forEach(advice => {
+                    html += `<li style="margin-bottom: 10px;">${advice}</li>`;
+                });
+                html += '</ul>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function updateMarketPrices() {
+            loadMarketPrices();
+        }
+
+        // Soil Analysis Functions
+        async function loadSoilAnalysis() {
+            const county = document.getElementById('currentCounty').value;
+            
+            try {
+                const response = await axios.post(`${API_BASE_URL}/soil/analysis`, {
+                    county: county
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+                
+                if (response.data.success) {
+                    updateSoilAnalysisUI(response.data.soil_analysis);
+                }
+            } catch (error) {
+                console.error('Error loading soil analysis:', error);
+            }
+        }
+
+        function updateSoilAnalysisUI(soilData) {
+            // Update basic info
+            document.getElementById('soilTexture').textContent = soilData.soil_texture;
+            document.getElementById('soilDetailedPH').textContent = soilData.ph;
+            document.getElementById('soilOrganic').textContent = `${soilData.organic_carbon_percent}%`;
+            
+            // Update nutrient levels
+            const nutrientsContainer = document.getElementById('nutrientLevels');
+            nutrientsContainer.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: 10px;">
+                        <div style="color: var(--text-light); font-size: 0.9rem;">Nitrogen</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-green);">
+                            ${soilData.nitrogen_percent}%
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: 10px;">
+                        <div style="color: var(--text-light); font-size: 0.9rem;">Phosphorus</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-green);">
+                            ${soilData.phosphorus_ppm || '15'} ppm
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: 10px;">
+                        <div style="color: var(--text-light); font-size: 0.9rem;">Potassium</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-green);">
+                            ${soilData.potassium_ppm || '120'} ppm
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: 10px;">
+                        <div style="color: var(--text-light); font-size: 0.9rem;">CEC</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-green);">
+                            ${soilData.cec}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Update fertilizer recommendations
+            const fertilizerContainer = document.getElementById('fertilizerRecommendations');
+            if (soilData.recommendations && soilData.recommendations.length > 0) {
+                fertilizerContainer.innerHTML = `
+                    <ul style="padding-left: 20px;">
+                        ${soilData.recommendations.map(rec => `<li style="margin-bottom: 10px;">${rec}</li>`).join('')}
+                    </ul>
+                `;
+            }
+            
+            // Update suitable crops
+            const cropsContainer = document.getElementById('suitableCrops');
+            if (soilData.suitable_crops && soilData.suitable_crops.length > 0) {
+                cropsContainer.innerHTML = `
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${soilData.suitable_crops.map(crop => `
+                            <span style="background: var(--light-green); color: white; padding: 8px 15px; border-radius: 20px;">
+                                ${crop}
+                            </span>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        // Utility Functions
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            // Set color based on type
+            if (type === 'success') {
+                notification.style.backgroundColor = 'var(--light-green)';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = 'var(--danger-red)';
+            } else if (type === 'warning') {
+                notification.style.backgroundColor = 'var(--warning-orange)';
+            } else {
+                notification.style.backgroundColor = 'var(--water-blue)';
+            }
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                type === 'error' ? 'exclamation-circle' : 
+                                type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        function updateDashboard() {
+            const county = document.getElementById('currentCounty').value;
+            showNotification(`Updated to ${county} County`, 'info');
+            loadDashboardData();
+        }
+
+        function updateCropData() {
+            const crop = document.getElementById('primaryCrop').value;
+            showNotification(`Now viewing ${crop} data`, 'info');
+            // In a real app, this would load crop-specific data
+        }
+
+        function checkWeather() {
+            showSection('weather');
+            loadWeatherData();
+        }
+
+        function showTreatment() {
+            showNotification('Opening detailed treatment guide...', 'info');
+            // In a real app, this would open a detailed treatment modal
+        }
+
+        function saveDetection() {
+            showNotification('Disease report saved successfully', 'success');
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
